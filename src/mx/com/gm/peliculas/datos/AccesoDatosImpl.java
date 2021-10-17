@@ -17,21 +17,15 @@ import mx.com.gm.peliculas.excepciones.LecturaDatosException;
 public class AccesoDatosImpl implements AccesoDatos {
 
     @Override
-    public boolean existe() throws LecturaDatosException {
-        File file = new File(AccesoDatos.nombreArchivo);
-
-        if (file.exists()) {
-            return true;
-        } else {
-            return false;
-        }
-
+    public boolean existe(String nombreArchivo) throws LecturaDatosException {
+        File file = new File(nombreArchivo);
+        return file.exists();
     }
 
     @Override
-    public List<Pelicula> listar() throws LecturaDatosException {
+    public List<Pelicula> listar(String nombreArchivo) throws LecturaDatosException {
         List<Pelicula> peliculas = new ArrayList<>();
-        File file = new File(AccesoDatos.nombreArchivo);
+        File file = new File(nombreArchivo);
         FileReader fr = null; // se crea instancia del obj. FileReader
         BufferedReader br = null; // se crea instancia del obj. BufferedReader
 
@@ -65,26 +59,26 @@ public class AccesoDatosImpl implements AccesoDatos {
     public void escribir(Pelicula pelicula, String nombreArchivo, boolean anexar) throws EscrituraDatosException {
         java.io.PrintWriter salida = null;
         try {
-            File file = new File(AccesoDatos.nombreArchivo);
+            File file = new File(nombreArchivo);
             salida = new PrintWriter(new FileWriter(file, anexar));
             salida.println(pelicula.toString());
             System.out.println("Se ha escrito informacion al archivo: " + pelicula.toString());
         } catch (IOException ex) {
-           ex.printStackTrace();
-           throw new EscrituraDatosException("Error al escribir  peliculas: "+ ex.getMessage());
+            ex.printStackTrace();
+            throw new EscrituraDatosException("Error al escribir  peliculas: " + ex.getMessage());
         } finally {
             salida.close();
         }
     }
 
     @Override
-    public String buscar( String buscar) throws LecturaDatosException {
-        List<Pelicula> peliculas = listar();
+    public String buscar(String nombreArchivo, String buscar) throws LecturaDatosException {
+        List<Pelicula> peliculas = listar(nombreArchivo);
         String resultado = null;
-       
+
         for (Pelicula pelicula : peliculas) {
-            if(pelicula.getNombre().equalsIgnoreCase(buscar) && buscar != null){
-                resultado = "Pelicula " + pelicula + " encontrada en el indice: "+ peliculas.indexOf(pelicula);
+            if (pelicula.getNombre().equalsIgnoreCase(buscar) && buscar != null) {
+                resultado = "Pelicula " + pelicula + " encontrada en el indice: " + peliculas.indexOf(pelicula);
                 break;
             }
         }
@@ -92,9 +86,9 @@ public class AccesoDatosImpl implements AccesoDatos {
     }
 
     @Override
-    public void crear() throws AccesoDatosException {
+    public void crear(String nombreArchivo) throws AccesoDatosException {
         //se crea una instrancia del obj File y se le pasa por argumento el obj String con el nombre del archivo
-        File file = new File(AccesoDatos.nombreArchivo);
+        File file = new File(nombreArchivo);
         //si el archivo no existe sera creado.
         if (!file.exists()) {
             try {
@@ -107,8 +101,8 @@ public class AccesoDatosImpl implements AccesoDatos {
     }
 
     @Override
-    public void borrar() throws AccesoDatosException {
-        File file = new File(AccesoDatos.nombreArchivo);
+    public void borrar(String nombreArchivo) throws AccesoDatosException {
+        File file = new File(nombreArchivo);
         if (file.exists()) {
             boolean estado = file.delete();
             if (!estado) {
